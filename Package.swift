@@ -20,8 +20,8 @@ let package = Package(
             from: "2.0.0"
         ),
         .package(
-            url: "https://github.com/exyte/ActivityIndicatorView",
-            from: "1.0.0"
+            url: "https://github.com/InspireDevStdio/ExyteActivityIndicator",
+            branch: "old"
         ),
         .package(
            url: "https://github.com/Giphy/giphy-ios-sdk",
@@ -33,7 +33,7 @@ let package = Package(
             name: "ExyteChat",
             dependencies: [
                 .product(name: "ExyteMediaPicker", package: "MediaPicker"),
-                .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView"),
+                .product(name: "ExyteActivityIndicator", package: "ExyteActivityIndicator"),
                 .product(name: "GiphyUISDK", package: "giphy-ios-sdk")
             ],
             path: "Sources"
