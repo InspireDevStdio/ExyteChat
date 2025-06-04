@@ -379,7 +379,7 @@ struct InputView: View {
     
     var sendButton: some View {
         Button {
-            if !viewModel.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if !viewModel.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !viewModel.attachments.medias.isEmpty {
                 onAction(.send)
             }
         } label: {
