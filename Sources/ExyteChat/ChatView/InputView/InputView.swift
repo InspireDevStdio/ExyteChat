@@ -379,7 +379,9 @@ struct InputView: View {
     
     var sendButton: some View {
         Button {
-            onAction(.send)
+            if !viewModel.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                onAction(.send)
+            }
         } label: {
             theme.images.inputView.arrowSend
                 .viewSize(48)

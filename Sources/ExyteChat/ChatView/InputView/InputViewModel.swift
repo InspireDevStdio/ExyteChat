@@ -234,7 +234,7 @@ private extension InputViewModel {
         return mapAttachmentsForSend()
             .compactMap { [attachments] _ in
                 DraftMessage(
-                    text: self.text,
+                    text: self.text.trimmingCharacters(in: .whitespacesAndNewlines),
                     medias: attachments.medias,
                     giphyMedia: attachments.giphyMedia,
                     recording: attachments.recording,
