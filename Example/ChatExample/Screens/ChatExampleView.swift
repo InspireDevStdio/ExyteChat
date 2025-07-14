@@ -27,6 +27,9 @@ struct ChatExampleView: View {
         .enableLoadMore(pageSize: 3) { message in
             viewModel.loadMoreMessage(before: message)
         }
+        .onTextChange { currentText in
+            print("Real-time text:", currentText)
+        }
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)

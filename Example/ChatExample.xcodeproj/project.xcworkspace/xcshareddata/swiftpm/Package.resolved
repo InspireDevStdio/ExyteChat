@@ -1,12 +1,21 @@
 {
   "pins" : [
     {
-      "identity" : "activityindicatorview",
+      "identity" : "exyteactivityindicator",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/ActivityIndicatorView",
+      "location" : "https://github.com/InspireDevStdio/ExyteActivityIndicator",
       "state" : {
-        "revision" : "9970fd0bb7a05dad0b6566ae1f56937716686b24",
-        "version" : "1.1.1"
+        "branch" : "old",
+        "revision" : "86d8f8321fd9f844a6667dd5832648d2c864ac0d"
+      }
+    },
+    {
+      "identity" : "exytemediapicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/InspireDevStdio/ExyteMediaPicker",
+      "state" : {
+        "branch" : "old",
+        "revision" : "bb43da20d91f4e1953ffbb9863740fc495901806"
       }
     },
     {
@@ -25,15 +34,6 @@
       "state" : {
         "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
         "version" : "1.5.0"
-      }
-    },
-    {
-      "identity" : "mediapicker",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/MediaPicker.git",
-      "state" : {
-        "revision" : "88769b1b69c2b5e5fa5b65522c08bc7b667a6cb8",
-        "version" : "2.2.3"
       }
     }
   ],

@@ -105,7 +105,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     /// provide strings for the chat view, these can be localized in the Localizable.strings files
     var localization: ChatLocalization = createLocalization()
-    
+
+    /// closure to notify when input text changes
+    var onTextChange: ((String) -> Void)? = nil
+
     // MARK: - Customization
     
     var isListAboveInputView: Bool = true
@@ -205,6 +208,11 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 if let giphyMedia = newValue {
                     inputViewModel.attachments.giphyMedia = giphyMedia
                     inputViewModel.send()
+                }
+            }
+            .onChange(of: viewModel.inputViewModel?.text) { newValue in
+                if let onTextChange = onTextChange {
+                    onTextChange(newValue ?? "")
                 }
             }
             .sheet(isPresented: $inputViewModel.showGiphyPicker) {
@@ -503,7 +511,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
 }
 
 public extension ChatView {
-    
+
     func betweenListAndInputViewBuilder<V: View>(_ builder: @escaping ()->V) -> ChatView {
         var view = self
         view.betweenListAndInputViewBuilder = {
@@ -576,7 +584,13 @@ public extension ChatView {
         view.orientationHandler = orientationHandler
         return view
     }
-    
+
+    func onTextChange(_ handler: @escaping (String) -> Void) -> ChatView {
+        var copy = self
+        copy.onTextChange = handler
+        return copy
+    }
+
     /// when user scrolls up to `pageSize`-th meassage, call the handler function, so user can load more messages
     /// NOTE: doesn't work well with `isScrollEnabled` false
     func enableLoadMore(pageSize: Int, _ handler: @escaping ChatPaginationClosure) -> ChatView {
