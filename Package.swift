@@ -17,11 +17,11 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/InspireDevStdio/ExyteMediaPicker",
-            branch: "old"
+            exact: "1.0.0"
         ),
         .package(
             url: "https://github.com/InspireDevStdio/ExyteActivityIndicator",
-            branch: "old"
+            exact: "1.0.0"
         ),
         .package(
            url: "https://github.com/Giphy/giphy-ios-sdk",
