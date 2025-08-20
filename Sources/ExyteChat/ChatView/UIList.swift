@@ -42,6 +42,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let sections: [MessagesSection]
     let ids: [String]
     let listSwipeActions: ListSwipeActions
+    let keyboardState: KeyboardState
 
     @State private var isScrolledToTop = false
 
@@ -373,7 +374,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
             messageStyler: messageStyler, showMessageTimeView: showMessageTimeView,
             messageFont: messageFont, sections: sections, ids: ids,
-            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions)
+            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions,
+            keyboardState: keyboardState)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -407,6 +409,9 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let ids: [String]
         let mainBackgroundColor: Color
         let listSwipeActions: ListSwipeActions
+        let keyboardState: KeyboardState
+        
+        private var previousContentOffset: CGFloat = 0
 
         init(
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
@@ -418,7 +423,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             messageStyler: @escaping (String) -> AttributedString, showMessageTimeView: Bool,
             messageFont: UIFont, sections: [MessagesSection], ids: [String],
             mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
-            listSwipeActions: ListSwipeActions
+            listSwipeActions: ListSwipeActions, keyboardState: KeyboardState
         ) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
@@ -441,6 +446,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.mainBackgroundColor = mainBackgroundColor
             self.paginationTargetIndexPath = paginationTargetIndexPath
             self.listSwipeActions = listSwipeActions
+            self.keyboardState = keyboardState
         }
 
         /// call pagination handler when this row is reached
@@ -599,8 +605,16 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            let currentOffset = scrollView.contentOffset.y
             isScrolledToBottom = scrollView.contentOffset.y <= 0
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
+            
+            // Dismiss keyboard only when scrolling up (away from latest messages)
+            if keyboardState.isShown && currentOffset > previousContentOffset {
+                keyboardState.resignFirstResponder()
+            }
+            
+            previousContentOffset = currentOffset
         }
     }
 
