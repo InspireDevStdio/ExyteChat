@@ -418,6 +418,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         
         private var previousContentOffset: CGFloat = 0
         var isProgrammaticallyScrolling: Bool = false
+        private var isPaginationLoading: Bool = false
 
         init(
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
@@ -605,8 +606,13 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             }
 
             let row = self.sections[indexPath.section].rows[indexPath.row]
+            isPaginationLoading = true
             Task.detached {
                 await paginationHandler.handleClosure(row.message)
+                // Reset the flag after a short delay to allow for content updates
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.isPaginationLoading = false
+                }
             }
         }
 
@@ -616,7 +622,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
             
             // Dismiss keyboard only when scrolling up (away from latest messages) and not programmatically
-            if keyboardState.isShown && currentOffset > previousContentOffset && !isProgrammaticallyScrolling {
+            // Also avoid dismissing keyboard during pagination loading to prevent conflicts
+            if keyboardState.isShown && currentOffset > previousContentOffset && !isProgrammaticallyScrolling && !isPaginationLoading {
                 keyboardState.resignFirstResponder()
             }
             
