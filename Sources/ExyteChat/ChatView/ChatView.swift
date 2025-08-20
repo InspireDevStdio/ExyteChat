@@ -138,6 +138,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
+    @State private var hasNewMessages: Bool = false
 
     /// Used to prevent the MainView from responding to keyboard changes while the Menu is active
     @State private var isShowingMenu = false
@@ -250,6 +251,24 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
+            .onChange(of: sections) { newSections in
+                // Check if new messages arrived while not scrolled to bottom
+                if !isScrolledToBottom && type == .conversation {
+                    // Compare with previous sections to detect new messages
+                    if let lastSection = newSections.last, let lastRow = lastSection.rows.last {
+                        // Check if this is a new message (not from current user)
+                        if !lastRow.message.user.isCurrentUser {
+                            hasNewMessages = true
+                        }
+                    }
+                }
+            }
+            .onChange(of: isScrolledToBottom) { newValue in
+                // Reset new messages indicator when scrolled to bottom
+                if newValue {
+                    hasNewMessages = false
+                }
+            }
     }
     
     var mainView: some View {
@@ -305,12 +324,23 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 if !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                        hasNewMessages = false
                     } label: {
-                        theme.images.scrollToBottom
-                            .frame(width: 40, height: 40)
-                            .circleBackground(theme.colors.messageFriendBG)
-                            .foregroundStyle(theme.colors.sendButtonBackground)
-                            .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
+                        ZStack {
+                            theme.images.scrollToBottom
+                                .frame(width: 40, height: 40)
+                                .circleBackground(theme.colors.messageFriendBG)
+                                .foregroundStyle(theme.colors.sendButtonBackground)
+                                .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
+                            
+                            // New message indicator dot
+                            if hasNewMessages {
+                                Circle()
+                                    .fill(theme.colors.sendButtonBackground)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: 14, y: -14)
+                            }
+                        }
                     }
                     .padding(8)
                 }
