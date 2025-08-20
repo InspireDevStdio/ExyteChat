@@ -69,7 +69,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
                 if !context.coordinator.sections.isEmpty {
+                    context.coordinator.isProgrammaticallyScrolling = true
                     tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
+                    // Reset the flag after animation completes
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        context.coordinator.isProgrammaticallyScrolling = false
+                    }
                 }
             }
         }
@@ -412,6 +417,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let keyboardState: KeyboardState
         
         private var previousContentOffset: CGFloat = 0
+        var isProgrammaticallyScrolling: Bool = false
 
         init(
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
@@ -609,8 +615,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             isScrolledToBottom = scrollView.contentOffset.y <= 0
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
             
-            // Dismiss keyboard only when scrolling up (away from latest messages)
-            if keyboardState.isShown && currentOffset > previousContentOffset {
+            // Dismiss keyboard only when scrolling up (away from latest messages) and not programmatically
+            if keyboardState.isShown && currentOffset > previousContentOffset && !isProgrammaticallyScrolling {
                 keyboardState.resignFirstResponder()
             }
             
