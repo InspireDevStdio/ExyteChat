@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import ExyteMediaPicker
 
+@MainActor
 final class InputViewModel: ObservableObject {
 
     @Published var text = ""
@@ -44,15 +45,13 @@ final class InputViewModel: ObservableObject {
     }
 
     func reset() {
-        DispatchQueue.main.async { [weak self] in
-            self?.showPicker = false
-            self?.showGiphyPicker = false
-            self?.text = ""
-            self?.saveEditingClosure = nil
-            self?.attachments = InputViewAttachments()
-            self?.subscribeValidation()
-            self?.state = .empty
-        }
+        showPicker = false
+        showGiphyPicker = false
+        text = ""
+        saveEditingClosure = nil
+        attachments = InputViewAttachments()
+        subscribeValidation()
+        state = .empty
     }
 
     func send() {
@@ -126,13 +125,11 @@ final class InputViewModel: ObservableObject {
         if recorder.isRecording {
             return
         }
-        Task { @MainActor in
+        Task {
             attachments.recording = Recording()
             let url = await recorder.startRecording { duration, samples in
-                DispatchQueue.main.async { [weak self] in
-                    self?.attachments.recording?.duration = duration
-                    self?.attachments.recording?.waveformSamples = samples
-                }
+                self.attachments.recording?.duration = duration
+                self.attachments.recording?.waveformSamples = samples
             }
             if state == .waitingForRecordingPermission {
                 state = .isRecordingTap
@@ -145,16 +142,13 @@ final class InputViewModel: ObservableObject {
 private extension InputViewModel {
 
     func validateDraft() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            guard state != .editing else { return } // special case
-            if !self.text.isEmpty || !self.attachments.medias.isEmpty {
-                self.state = .hasTextOrMedia
-            } else if self.text.isEmpty,
-                      self.attachments.medias.isEmpty,
-                      self.attachments.recording == nil {
-                self.state = .empty
-            }
+        guard state != .editing else { return } // special case
+        if !text.isEmpty || !attachments.medias.isEmpty {
+            state = .hasTextOrMedia
+        } else if text.isEmpty,
+                  attachments.medias.isEmpty,
+                  attachments.recording == nil {
+            state = .empty
         }
     }
 
@@ -226,6 +220,7 @@ private extension InputViewModel {
                 $0
             }
             .collect()
+            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 
@@ -244,10 +239,8 @@ private extension InputViewModel {
             }
             .sink { [weak self] draft in
                 self?.didSendMessage?(draft)
-                DispatchQueue.main.async { [weak self] in
-                    self?.showActivityIndicator = false
-                    self?.reset()
-                }
+                self?.showActivityIndicator = false
+                self?.reset()
             }
     }
 }

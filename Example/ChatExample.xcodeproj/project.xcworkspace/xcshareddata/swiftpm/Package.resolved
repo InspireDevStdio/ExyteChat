@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/InspireDevStdio/ExyteActivityIndicator",
       "state" : {
-        "branch" : "old",
-        "revision" : "86d8f8321fd9f844a6667dd5832648d2c864ac0d"
+        "revision" : "86d8f8321fd9f844a6667dd5832648d2c864ac0d",
+        "version" : "1.0.0"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/InspireDevStdio/ExyteMediaPicker",
       "state" : {
-        "branch" : "old",
-        "revision" : "bb43da20d91f4e1953ffbb9863740fc495901806"
+        "revision" : "bb43da20d91f4e1953ffbb9863740fc495901806",
+        "version" : "1.0.0"
       }
     },
     {
