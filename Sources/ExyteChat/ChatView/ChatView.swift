@@ -129,6 +129,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
     var recorderSettings: RecorderSettings = RecorderSettings()
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
+    var hasNewMessagesBinding: Binding<Bool>?
     
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
@@ -138,7 +139,21 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
-    @State private var hasNewMessages: Bool = false
+    @State private var internalHasNewMessages: Bool = false
+    
+    /// Getter for the current hasNewMessages state
+    private var hasNewMessages: Bool {
+        hasNewMessagesBinding?.wrappedValue ?? internalHasNewMessages
+    }
+    
+    /// Function to update hasNewMessages state
+    private func updateHasNewMessages(_ value: Bool) {
+        if let binding = hasNewMessagesBinding {
+            binding.wrappedValue = value
+        } else {
+            internalHasNewMessages = value
+        }
+    }
 
     /// Used to prevent the MainView from responding to keyboard changes while the Menu is active
     @State private var isShowingMenu = false
@@ -251,24 +266,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     globalFocusState.focus = nil
                 }
             }
-            .onChange(of: sections) { newSections in
-                // Check if new messages arrived while not scrolled to bottom
-                if !isScrolledToBottom && type == .conversation {
-                    // Compare with previous sections to detect new messages
-                    if let lastSection = newSections.last, let lastRow = lastSection.rows.last {
-                        // Check if this is a new message (not from current user)
-                        if !lastRow.message.user.isCurrentUser {
-                            hasNewMessages = true
-                        }
-                    }
-                }
-            }
-            .onChange(of: isScrolledToBottom) { newValue in
-                // Reset new messages indicator when scrolled to bottom
-                if newValue {
-                    hasNewMessages = false
-                }
-            }
     }
     
     var mainView: some View {
@@ -324,7 +321,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 if !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
-                        hasNewMessages = false
+                        updateHasNewMessages(false)
                     } label: {
                         ZStack {
                             theme.images.scrollToBottom
@@ -664,6 +661,12 @@ public extension ChatView {
     func showMessageTimeView(_ isShow: Bool) -> ChatView {
         var view = self
         view.showMessageTimeView = isShow
+        return view
+    }
+    
+    func hasNewMessages(_ binding: Binding<Bool>) -> ChatView {
+        var view = self
+        view.hasNewMessagesBinding = binding
         return view
     }
     
