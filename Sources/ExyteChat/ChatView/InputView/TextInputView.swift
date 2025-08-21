@@ -17,12 +17,9 @@ struct TextInputView: View {
     var localization: ChatLocalization
     
     var body: some View {
-        TextField("", text: $text, axis: .vertical)
+        TextField("", text: $text, prompt: Text(localization.inputPlaceholder)
+            .foregroundColor(theme.colors.inputPlaceholderText), axis: .vertical)
             .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
-            .placeholder(when: text.isEmpty) {
-                Text(localization.inputPlaceholder)
-                    .foregroundColor(theme.colors.inputPlaceholderText)
-            }
             .foregroundColor(theme.colors.inputText)
             .padding(.vertical, 10)
             .padding(.leading, !isMediaGiphyAvailable() ? 12 : 0)
