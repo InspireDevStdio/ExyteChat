@@ -6,6 +6,7 @@ import Foundation
 
 public typealias ChatPaginationClosure = (Message) async -> Void
 
+@MainActor
 final class PaginationHandler: ObservableObject {
     var handleClosure: ChatPaginationClosure
     var pageSize: Int

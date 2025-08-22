@@ -7,6 +7,7 @@ import Combine
 import AVKit
 
 // TODO: Create option "download video before playing"
+@MainActor
 final class VideoViewModel: ObservableObject {
 
     @Published var attachment: Attachment

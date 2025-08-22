@@ -8,6 +8,7 @@
 import Combine
 import AVFoundation
 
+@MainActor
 final class RecordingPlayer: ObservableObject {
 
     @Published var playing = false
@@ -60,10 +61,11 @@ final class RecordingPlayer: ObservableObject {
             if let url = recording.url {
                 setupPlayer(for: url, trackDuration: recording.duration)
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.player?.seek(to: CMTime(seconds: goalTime, preferredTimescale: 10))
-                if self?.playing == nil || self?.playing == false  {
-                    self?.play()
+            Task {
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                await self.player?.seek(to: CMTime(seconds: goalTime, preferredTimescale: 10))
+                if self.playing == false  {
+                    self.play()
                 }
             }
             return

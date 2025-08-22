@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 
+@MainActor
 final class FullscreenMediaPagesViewModel: ObservableObject {
     var attachments: [Attachment]
     @Published var index: Int

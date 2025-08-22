@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import UIKit
 
+@MainActor
 final class ChatViewModel: ObservableObject {
 
     @Published private(set) var fullscreenAttachmentItem: Optional<Attachment> = nil
@@ -43,13 +44,10 @@ final class ChatViewModel: ObservableObject {
 
     func messageMenuAction() -> (Message, DefaultMessageMenuAction) -> Void {
         { [weak self] message, action in
-            DispatchQueue.main.async {
-                self?.messageMenuActionInternal(message: message, action: action)
-            }
+            self?.messageMenuActionInternal(message: message, action: action)
         }
     }
 
-    @MainActor
     func messageMenuActionInternal(message: Message, action: DefaultMessageMenuAction) {
         switch action {
         case .copy:
