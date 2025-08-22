@@ -64,6 +64,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.backgroundColor = UIColor(theme.colors.mainBG)
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = isScrollEnabled
+        tableView.keyboardDismissMode = .interactive
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
