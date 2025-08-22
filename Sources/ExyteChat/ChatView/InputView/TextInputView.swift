@@ -16,21 +16,21 @@ struct TextInputView: View {
     var availableInputs: [AvailableInputType]
     var localization: ChatLocalization
     
-    @State private var textViewHeight: CGFloat = 48
-    
     var body: some View {
-        CustomTextField(
-            text: $text,
-            inputFieldId: inputFieldId,
-            style: style,
-            availableInputs: availableInputs,
-            localization: localization,
-            textViewHeight: $textViewHeight
-        )
-        .frame(height: textViewHeight)
-        .onTapGesture {
-            globalFocusState.focus = .uuid(inputFieldId)
-        }
+        TextField("", text: $text, prompt: Text(localization.inputPlaceholder)
+            .foregroundColor(theme.colors.inputPlaceholderText), axis: .vertical)
+            .customFocus($globalFocusState.focus, equals: .uuid(inputFieldId))
+            .foregroundColor(theme.colors.inputText)
+            .padding(.vertical, 10)
+            .padding(.leading, !isMediaGiphyAvailable() ? 12 : 0)
+            .onTapGesture {
+                globalFocusState.focus = .uuid(inputFieldId)
+            }
+    }
+    
+    private func isMediaGiphyAvailable() -> Bool {
+        return availableInputs.contains(AvailableInputType.media)
+        || availableInputs.contains(AvailableInputType.giphy)
     }
 }
 
