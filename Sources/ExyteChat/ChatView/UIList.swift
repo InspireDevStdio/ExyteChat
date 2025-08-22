@@ -42,7 +42,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let sections: [MessagesSection]
     let ids: [String]
     let listSwipeActions: ListSwipeActions
-    let keyboardState: KeyboardState
 
     @State private var isScrolledToTop = false
 
@@ -69,12 +68,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
                 if !context.coordinator.sections.isEmpty {
-                    context.coordinator.isProgrammaticallyScrolling = true
                     tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .bottom, animated: true)
-                    // Reset the flag after animation completes
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        context.coordinator.isProgrammaticallyScrolling = false
-                    }
                 }
             }
         }
@@ -379,8 +373,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
             messageStyler: messageStyler, showMessageTimeView: showMessageTimeView,
             messageFont: messageFont, sections: sections, ids: ids,
-            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions,
-            keyboardState: keyboardState)
+            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -414,11 +407,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let ids: [String]
         let mainBackgroundColor: Color
         let listSwipeActions: ListSwipeActions
-        let keyboardState: KeyboardState
-        
-        private var previousContentOffset: CGFloat = 0
-        var isProgrammaticallyScrolling: Bool = false
-        private var isPaginationLoading: Bool = false
 
         init(
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
@@ -430,7 +418,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             messageStyler: @escaping (String) -> AttributedString, showMessageTimeView: Bool,
             messageFont: UIFont, sections: [MessagesSection], ids: [String],
             mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
-            listSwipeActions: ListSwipeActions, keyboardState: KeyboardState
+            listSwipeActions: ListSwipeActions
         ) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
@@ -453,7 +441,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.mainBackgroundColor = mainBackgroundColor
             self.paginationTargetIndexPath = paginationTargetIndexPath
             self.listSwipeActions = listSwipeActions
-            self.keyboardState = keyboardState
         }
 
         /// call pagination handler when this row is reached
@@ -606,28 +593,14 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             }
 
             let row = self.sections[indexPath.section].rows[indexPath.row]
-            isPaginationLoading = true
             Task.detached {
                 await paginationHandler.handleClosure(row.message)
-                // Reset the flag after a short delay to allow for content updates
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.isPaginationLoading = false
-                }
             }
         }
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            let currentOffset = scrollView.contentOffset.y
             isScrolledToBottom = scrollView.contentOffset.y <= 0
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
-            
-            // Dismiss keyboard only when scrolling up (away from latest messages) and not programmatically
-            // Also avoid dismissing keyboard during pagination loading to prevent conflicts
-            if keyboardState.isShown && currentOffset > previousContentOffset && !isProgrammaticallyScrolling && !isPaginationLoading {
-                keyboardState.resignFirstResponder()
-            }
-            
-            previousContentOffset = currentOffset
         }
     }
 
