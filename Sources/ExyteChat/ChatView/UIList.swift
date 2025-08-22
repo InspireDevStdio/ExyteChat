@@ -42,6 +42,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
     let sections: [MessagesSection]
     let ids: [String]
     let listSwipeActions: ListSwipeActions
+    let keyboardDismissMode: UIScrollView.KeyboardDismissMode
 
     @State private var isScrolledToTop = false
 
@@ -64,7 +65,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.backgroundColor = UIColor(theme.colors.mainBG)
         tableView.scrollsToTop = false
         tableView.isScrollEnabled = isScrollEnabled
-        tableView.keyboardDismissMode = .interactive
+        tableView.keyboardDismissMode = keyboardDismissMode
 
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
@@ -374,7 +375,8 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             tapAvatarClosure: tapAvatarClosure, paginationHandler: paginationHandler,
             messageStyler: messageStyler, showMessageTimeView: showMessageTimeView,
             messageFont: messageFont, sections: sections, ids: ids,
-            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions)
+            mainBackgroundColor: theme.colors.mainBG, listSwipeActions: listSwipeActions,
+            keyboardDismissMode: keyboardDismissMode)
     }
 
     class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
@@ -408,6 +410,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         let ids: [String]
         let mainBackgroundColor: Color
         let listSwipeActions: ListSwipeActions
+        let keyboardDismissMode: UIScrollView.KeyboardDismissMode
 
         init(
             viewModel: ChatViewModel, inputViewModel: InputViewModel,
@@ -419,7 +422,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             messageStyler: @escaping (String) -> AttributedString, showMessageTimeView: Bool,
             messageFont: UIFont, sections: [MessagesSection], ids: [String],
             mainBackgroundColor: Color, paginationTargetIndexPath: IndexPath? = nil,
-            listSwipeActions: ListSwipeActions
+            listSwipeActions: ListSwipeActions, keyboardDismissMode: UIScrollView.KeyboardDismissMode
         ) {
             self.viewModel = viewModel
             self.inputViewModel = inputViewModel
@@ -442,6 +445,7 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
             self.mainBackgroundColor = mainBackgroundColor
             self.paginationTargetIndexPath = paginationTargetIndexPath
             self.listSwipeActions = listSwipeActions
+            self.keyboardDismissMode = keyboardDismissMode
         }
 
         /// call pagination handler when this row is reached

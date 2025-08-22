@@ -130,7 +130,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var recorderSettings: RecorderSettings = RecorderSettings()
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
     var hasNewMessagesBinding: Binding<Bool>?
-    
+    var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
+
     @StateObject private var viewModel = ChatViewModel()
     @StateObject private var inputViewModel = InputViewModel()
     @StateObject private var globalFocusState = GlobalFocusState()
@@ -372,7 +373,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             messageFont: messageFont,
             sections: sections,
             ids: ids,
-            listSwipeActions: listSwipeActions
+            listSwipeActions: listSwipeActions,
+            keyboardDismissMode: keyboardDismissMode
         )
         .applyIf(!isScrollEnabled) {
             $0.frame(height: tableContentHeight)
@@ -578,6 +580,15 @@ public extension ChatView {
     func isScrollEnabled(_ isScrollEnabled: Bool) -> ChatView {
         var view = self
         view.isScrollEnabled = isScrollEnabled
+        return view
+    }
+    
+    /// Sets the keyboard dismiss mode for the chat list
+    /// - Parameter mode: The keyboard dismiss mode (.interactive, .onDrag, or .none)
+    /// - Default is .none
+    func keyboardDismissMode(_ mode: UIScrollView.KeyboardDismissMode) -> ChatView {
+        var view = self
+        view.keyboardDismissMode = mode
         return view
     }
     
