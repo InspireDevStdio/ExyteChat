@@ -37,17 +37,20 @@ struct AttachmentCell: View {
     }
 
     var content: some View {
-        AsyncImageView(url: attachment.thumbnail)
+        AsyncImageView(attachment: attachment)
     }
 }
 
 struct AsyncImageView: View {
 
     @Environment(\.chatTheme) var theme
-    let url: URL
+    let attachment: Attachment
 
     var body: some View {
-        CachedAsyncImage(url: url, urlCache: .imageCache) { imageView in
+        CachedAsyncImage(
+            url: attachment.thumbnail,
+            cacheKey: attachment.thumbnailCacheKey
+        ) { imageView in
             imageView
                 .resizable()
                 .scaledToFill()

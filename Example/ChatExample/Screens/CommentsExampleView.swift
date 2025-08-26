@@ -150,7 +150,10 @@ struct CommentsExampleView: View {
                     if !message.attachments.isEmpty {
                         LazyVGrid(columns: Array(repeating: GridItem(), count: 2), spacing: 8) {
                             ForEach(message.attachments) { attachment in
-                                CachedAsyncImage(url: attachment.thumbnail) { image in
+                                CachedAsyncImage(
+                                    url: attachment.thumbnail,
+                                    cacheKey: attachment.thumbnailCacheKey
+                                ) { image in
                                     image
                                         .resizable()
                                         .aspectRatio(1, contentMode: .fill)

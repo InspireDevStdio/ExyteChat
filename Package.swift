@@ -27,6 +27,10 @@ let package = Package(
            url: "https://github.com/Giphy/giphy-ios-sdk",
            from: "2.2.13"
         ),
+        .package(
+            url: "https://github.com/onevcat/Kingfisher",
+            from: "8.5.0"
+        ),
     ],
     targets: [
         .target(
@@ -34,7 +38,8 @@ let package = Package(
             dependencies: [
                 .product(name: "ExyteMediaPicker", package: "ExyteMediaPicker"),
                 .product(name: "ExyteActivityIndicator", package: "ExyteActivityIndicator"),
-                .product(name: "GiphyUISDK", package: "giphy-ios-sdk")
+                .product(name: "GiphyUISDK", package: "giphy-ios-sdk"),
+                .product(name: "Kingfisher", package: "Kingfisher")
             ],
             path: "Sources"
         ),
