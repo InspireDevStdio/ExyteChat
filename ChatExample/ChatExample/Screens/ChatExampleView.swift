@@ -31,6 +31,9 @@ struct ChatExampleView: View {
             }
         }
         .keyboardDismissMode(.interactive)
+        .onTextChange { currentText in
+            print("Real-time text:", currentText)
+        }
         .messageUseMarkdown(true)
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
