@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import CachedAsyncImage
+import ExyteChat
 
 struct AvatarView: View {
     let url: URL?
