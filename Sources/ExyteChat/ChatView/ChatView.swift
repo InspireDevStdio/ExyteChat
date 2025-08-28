@@ -392,9 +392,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         .onPreferenceChange(MessageMenuPreferenceKey.self) {
             self.cellFrames = $0
         }
-        .onTapGesture {
-            globalFocusState.focus = nil
-        }
         .onAppear {
             viewModel.didSendMessage = didSendMessage
             viewModel.inputViewModel = inputViewModel

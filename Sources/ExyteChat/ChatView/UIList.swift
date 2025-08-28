@@ -67,6 +67,11 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         tableView.isScrollEnabled = isScrollEnabled
         tableView.keyboardDismissMode = keyboardDismissMode
 
+        // Add tap gesture to dismiss keyboard when tapping on empty areas
+        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleBackgroundTap))
+        tapGesture.cancelsTouchesInView = false
+        tableView.addGestureRecognizer(tapGesture)
+
         NotificationCenter.default.addObserver(forName: .onScrollToBottom, object: nil, queue: nil) { _ in
             DispatchQueue.main.async {
                 if !context.coordinator.sections.isEmpty {
@@ -576,7 +581,6 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
                 .transition(.scale)
                 .background(MessageMenuPreferenceViewSetter(id: row.id))
                 .rotationEffect(Angle(degrees: (type == .conversation ? 180 : 0)))
-                .onTapGesture {}
                 .applyIf(showMessageMenuOnLongPress) {
                     $0.onLongPressGesture {
                         // Trigger haptic feedback
@@ -606,6 +610,12 @@ struct UIList<MessageContent: View, InputView: View>: UIViewRepresentable {
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             isScrolledToBottom = scrollView.contentOffset.y <= 0
             isScrolledToTop = scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height - 1
+        }
+        
+        @objc func handleBackgroundTap() {
+            // Dismiss keyboard when tapping on background
+            print("[UIList] Background tap detected, dismissing keyboard")
+            viewModel.globalFocusState?.focus = nil
         }
     }
 

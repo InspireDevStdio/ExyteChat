@@ -32,12 +32,14 @@ struct AttachmentCell: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
+            print("[AttachmentCell] Tap detected for attachment: \(attachment.id)")
             onTap(attachment)
         }
     }
 
     var content: some View {
         AsyncImageView(attachment: attachment)
+            .allowsHitTesting(false)
     }
 }
 

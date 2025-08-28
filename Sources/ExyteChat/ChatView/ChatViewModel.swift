@@ -29,6 +29,7 @@ final class ChatViewModel: ObservableObject {
     var globalFocusState: GlobalFocusState?
 
     func presentAttachmentFullScreen(_ attachment: Attachment) {
+        print("[ChatViewModel] Presenting attachment fullscreen: \(attachment.id)")
         fullscreenAttachmentItem = attachment
         fullscreenAttachmentPresented = true
     }
