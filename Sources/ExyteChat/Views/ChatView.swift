@@ -130,6 +130,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var availableInputs: [AvailableInputType] = [.text, .audio, .giphy, .media]
     var recorderSettings: RecorderSettings = RecorderSettings()
     var listSwipeActions: ListSwipeActions = ListSwipeActions()
+    var hasNewMessagesBinding: Binding<Bool>?
     var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     
     @StateObject private var viewModel = ChatViewModel()
@@ -140,6 +141,21 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     @State private var isScrolledToBottom: Bool = true
     @State private var shouldScrollToTop: () -> () = {}
+    @State private var internalHasNewMessages: Bool = false
+
+    /// Getter for the current hasNewMessages state
+    private var hasNewMessages: Bool {
+        hasNewMessagesBinding?.wrappedValue ?? internalHasNewMessages
+    }
+
+    /// Function to update hasNewMessages state
+    private func updateHasNewMessages(_ value: Bool) {
+        if let binding = hasNewMessagesBinding {
+            binding.wrappedValue = value
+        } else {
+            internalHasNewMessages = value
+        }
+    }
 
     /// Used to prevent the MainView from responding to keyboard changes while the Menu is active
     @State private var isShowingMenu = false
@@ -307,12 +323,23 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 if !isScrolledToBottom {
                     Button {
                         NotificationCenter.default.post(name: .onScrollToBottom, object: nil)
+                        updateHasNewMessages(false)
                     } label: {
-                        theme.images.scrollToBottom
-                            .frame(width: 40, height: 40)
-                            .circleBackground(theme.colors.messageFriendBG)
-                            .foregroundStyle(theme.colors.sendButtonBackground)
-                            .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
+                        ZStack {
+                            theme.images.scrollToBottom
+                                .frame(width: 40, height: 40)
+                                .circleBackground(theme.colors.messageFriendBG)
+                                .foregroundStyle(theme.colors.sendButtonBackground)
+                                .shadow(color: .primary.opacity(0.1), radius: 2, y: 1)
+
+                            // New message indicator dot
+                            if hasNewMessages {
+                                Circle()
+                                    .fill(theme.colors.sendButtonBackground)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: 14, y: -14)
+                            }
+                        }
                     }
                     .padding(.trailing, MessageView.horizontalScreenEdgePadding)
                     .padding(.bottom, 8)
@@ -702,6 +729,12 @@ public extension ChatView {
     
     func linkPreviewsDisabled() -> ChatView {
         return messageLinkPreviewLimit(0)
+    }
+
+    func hasNewMessages(_ binding: Binding<Bool>) -> ChatView {
+        var view = self
+        view.hasNewMessagesBinding = binding
+        return view
     }
 
     func setMessageFont(_ font: UIFont) -> ChatView {
