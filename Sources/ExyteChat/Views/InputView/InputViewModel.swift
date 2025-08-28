@@ -225,9 +225,14 @@ private extension InputViewModel {
 private extension InputViewModel {
 
     func sendMessage() {
+        guard
+            !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            !attachments.medias.isEmpty
+        else { return }
+
         showActivityIndicator = true
         let draft = DraftMessage(
-            text: self.text,
+            text: self.text.trimmingCharacters(in: .whitespacesAndNewlines),
             medias: attachments.medias,
             giphyMedia: attachments.giphyMedia,
             recording: attachments.recording,
