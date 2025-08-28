@@ -1,21 +1,30 @@
 {
   "pins" : [
     {
-      "identity" : "activityindicatorview",
+      "identity" : "exyteactivityindicator",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/ActivityIndicatorView",
+      "location" : "https://github.com/InspireDevStdio/ExyteActivityIndicator",
       "state" : {
-        "revision" : "36140867802ae4a1d2b11490bcbbefe058001d14",
-        "version" : "1.2.1"
+        "revision" : "86d8f8321fd9f844a6667dd5832648d2c864ac0d",
+        "version" : "1.0.0"
       }
     },
     {
-      "identity" : "anchoredpopup",
+      "identity" : "exyteanchoredpopup",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/AnchoredPopup.git",
+      "location" : "https://github.com/InspireDevStdio/ExyteAnchoredPopup.git",
       "state" : {
-        "revision" : "787f27027d3ef38c01469d228ce062ab4d5645f5",
-        "version" : "1.0.6"
+        "revision" : "23e3b8aaa6abc4b9b153dd7aa3ba7f564d52df07",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "exytemediapicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/InspireDevStdio/ExyteMediaPicker",
+      "state" : {
+        "revision" : "062e86ca0466d005721185dcbcac8ec5b07203c0",
+        "version" : "1.0.1"
       }
     },
     {
@@ -28,21 +37,21 @@
       }
     },
     {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher",
+      "state" : {
+        "revision" : "2015fda791daa72c8058619545a593bf8c1dd59f",
+        "version" : "8.5.0"
+      }
+    },
+    {
       "identity" : "libwebp-xcode",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/libwebp-Xcode",
       "state" : {
         "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
         "version" : "1.5.0"
-      }
-    },
-    {
-      "identity" : "mediapicker",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/MediaPicker.git",
-      "state" : {
-        "revision" : "c287ee410e5d9e9d642ed9c715042830f174a1d6",
-        "version" : "3.1.4"
       }
     }
   ],

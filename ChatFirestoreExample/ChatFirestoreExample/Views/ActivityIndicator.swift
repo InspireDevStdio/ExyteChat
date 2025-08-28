@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import ActivityIndicatorView
+import ExyteActivityIndicator
 
 struct ActivityIndicator: View {
     var body: some View {
