@@ -47,15 +47,13 @@ final class InputViewModel: ObservableObject {
     }
 
     func reset() {
-        DispatchQueue.main.async { [weak self] in
-            self?.showPicker = false
-            self?.showGiphyPicker = false
-            self?.text = ""
-            self?.saveEditingClosure = nil
-            self?.attachments = InputViewAttachments()
-            self?.subscribeValidation()
-            self?.state = .empty
-        }
+        showPicker = false
+        showGiphyPicker = false
+        text = ""
+        saveEditingClosure = nil
+        attachments = InputViewAttachments()
+        subscribeValidation()
+        state = .empty
     }
 
     func send() {
@@ -145,7 +143,7 @@ final class InputViewModel: ObservableObject {
         Task { @MainActor [recorder] in
             attachments.recording = Recording()
             let url = await recorder.startRecording { duration, samples in
-                DispatchQueue.main.async { [weak self] in
+                Task { @MainActor [weak self] in
                     self?.attachments.recording?.duration = duration
                     self?.attachments.recording?.waveformSamples = samples
                 }
@@ -161,16 +159,13 @@ final class InputViewModel: ObservableObject {
 private extension InputViewModel {
 
     func validateDraft() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            guard state != .editing else { return } // special case
-            if !self.text.isEmpty || !self.attachments.medias.isEmpty {
-                self.state = .hasTextOrMedia
-            } else if self.text.isEmpty,
-                      self.attachments.medias.isEmpty,
-                      self.attachments.recording == nil {
-                self.state = .empty
-            }
+        guard state != .editing else { return } // special case
+        if !text.isEmpty || !self.attachments.medias.isEmpty {
+            state = .hasTextOrMedia
+        } else if text.isEmpty,
+                  attachments.medias.isEmpty,
+                  attachments.recording == nil {
+            state = .empty
         }
     }
 
@@ -240,9 +235,7 @@ private extension InputViewModel {
             createdAt: Date()
         )
         didSendMessage?(draft)
-        DispatchQueue.main.async { [weak self] in
-            self?.showActivityIndicator = false
-            self?.reset()
-        }
+        showActivityIndicator = false
+        reset()
     }
 }
