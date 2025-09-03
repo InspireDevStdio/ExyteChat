@@ -80,7 +80,7 @@ struct AttachmentsEditor<InputViewContent: View>: View {
                 inputViewModel.showPicker = false
             }
             .currentFullscreenMedia($currentFullscreenMedia)
-//            .showLiveCameraCell()
+            .showLiveCameraCell()
             .setSelectionParameters(mediaPickerSelectionParameters)
             .pickerMode($inputViewModel.mediaPickerMode)
             .orientationHandler(orientationHandler)

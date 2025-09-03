@@ -187,6 +187,10 @@ struct InputView: View {
     var rightView: some View {
         Group {
             switch state {
+            case .empty, .waitingForRecordingPermission:
+                if case .message = style, isMediaAvailable() {
+                    cameraButton
+                }
             case .isRecordingHold, .isRecordingTap:
                 recordDurationInProcess
             case .hasRecording:
