@@ -35,6 +35,7 @@ struct ChatExampleView: View {
             print("Real-time text:", currentText)
         }
         .messageUseMarkdown(true)
+        .setMediaPickerParameters(MediaPickerParameters(liveCameraCell: MediaPickerLiveCameraStyle.prominant))
         .setRecorderSettings(recorderSettings)
         .messageReactionDelegate(viewModel)
         .swipeActions(edge: .leading, performsFirstActionWithFullSwipe: true, items: [

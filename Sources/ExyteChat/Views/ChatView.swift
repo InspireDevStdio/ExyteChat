@@ -9,7 +9,9 @@ import SwiftUI
 import GiphyUISDK
 import ExyteMediaPicker
 
-public typealias MediaPickerParameters = SelectionParamsHolder
+public typealias MediaPickerLiveCameraStyle = LiveCameraCellStyle
+public typealias MediaPickerSelectionParameters = SelectionParamsHolder
+public typealias MediaPickerParameters = MediaPickerParamsHolder
 
 public enum ChatType: CaseIterable, Sendable {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
@@ -80,6 +82,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     let sections: [MessagesSection]
     let ids: [String]
     let didSendMessage: (DraftMessage) -> Void
+    let didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)?
     var reactionDelegate: ReactionDelegate?
 
     // MARK: - View builders
@@ -120,7 +123,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     var messageMenuAnimationDuration: Double = 0.3
     var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
-    var mediaPickerSelectionParameters: MediaPickerParameters?
+    var mediaPickerSelectionParameters: MediaPickerSelectionParameters?
+    var mediaPickerParameters: MediaPickerParameters?
     var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
     var paginationHandler: PaginationHandler?
@@ -170,14 +174,15 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     public init(messages: [Message],
                 chatType: ChatType = .conversation,
                 replyMode: ReplyMode = .quote,
-                didSendMessage: @escaping (DraftMessage) -> Void,
                 reactionDelegate: ReactionDelegate? = nil,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
                 messageMenuAction: MessageMenuActionClosure?,
-                localization: ChatLocalization) {
+                localization: ChatLocalization,
+                didUpdateAttachmentStatus: ((AttachmentUploadUpdate) -> Void)? = nil,
+                didSendMessage: @escaping (DraftMessage) -> Void
+    ) {
         self.type = chatType
-        self.didSendMessage = didSendMessage
         self.reactionDelegate = reactionDelegate
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
         self.ids = messages.map { $0.id }
@@ -185,6 +190,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
         self.localization = localization
+        self.didUpdateAttachmentStatus = didUpdateAttachmentStatus
+        self.didSendMessage = didSendMessage
     }
     
     public var body: some View {
@@ -252,6 +259,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     messageStyler: messageStyler,
                     orientationHandler: orientationHandler,
                     mediaPickerSelectionParameters: mediaPickerSelectionParameters,
+                    mediaPickerParameters: mediaPickerParameters,
                     availableInputs: availableInputs,
                     localization: localization
                 )
@@ -392,7 +400,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 messageMenu(row)
                     .onAppear(perform: showMessageMenu)
             }
-            
         }
         .onPreferenceChange(MessageMenuPreferenceKey.self) { frames in
             DispatchQueue.main.async {
@@ -408,6 +415,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             viewModel.didSendMessage = didSendMessage
             viewModel.inputViewModel = inputViewModel
             viewModel.globalFocusState = globalFocusState
+            if let didUpdateAttachmentStatus {
+                viewModel.didUpdateAttachmentStatus = didUpdateAttachmentStatus
+            }
 
             inputViewModel.didSendMessage = { value in
                 Task { @MainActor in
@@ -428,6 +438,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 inputViewBuilder($inputViewModel.text, inputViewModel.attachments, inputViewModel.state, .message, inputViewModel.inputViewAction()) {
                     globalFocusState.focus = nil
                 }
+                .customFocus($globalFocusState.focus, equals: .uuid(viewModel.inputFieldId))
             } else {
                 InputView(
                     viewModel: inputViewModel,
@@ -533,9 +544,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     
     private func chatBackground() -> some View {
         Group {
-            
             if let background = theme.images.background {
-                
                 switch (isLandscape(), colorScheme) {
                 case (true, .dark):
                     background.landscapeBackgroundDark
@@ -553,6 +562,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                     background.portraitBackgroundLight
                         .resizable()
                         .ignoresSafeArea(background.safeAreaRegions, edges: background.safeAreaEdges)
+                default:
+                    theme.colors.mainBG
                 }
             } else {
                 theme.colors.mainBG
@@ -561,15 +572,15 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     }
     
     private func isLandscape() -> Bool {
-        return UIDevice.current.orientation.isLandscape
+        UIDevice.current.orientation.isLandscape
     }
     
     private func isGiphyAvailable() -> Bool {
-        return availableInputs.contains(AvailableInputType.giphy)
+        availableInputs.contains(AvailableInputType.giphy)
     }
     
     private static func createLocalization() -> ChatLocalization {
-        return ChatLocalization(
+        ChatLocalization(
             inputPlaceholder: String(localized: "Type a message..."),
             signatureText: String(localized: "Add signature..."),
             cancelButtonText: String(localized: "Cancel"),
@@ -648,17 +659,23 @@ public extension ChatView {
     
     func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
         var view = self
-        view.mediaPickerSelectionParameters = MediaPickerParameters()
+        view.mediaPickerSelectionParameters = MediaPickerSelectionParameters()
         view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
         return view
     }
     
-    func setMediaPickerSelectionParameters(_ params: MediaPickerParameters) -> ChatView {
+    func setMediaPickerSelectionParameters(_ params: MediaPickerSelectionParameters) -> ChatView {
         var view = self
         view.mediaPickerSelectionParameters = params
         return view
     }
-
+    
+    func setMediaPickerParameters(_ params: MediaPickerParameters) -> ChatView {
+        var view = self
+        view.mediaPickerParameters = params
+        return view
+    }
+    
     func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
         var view = self
         view.orientationHandler = orientationHandler
