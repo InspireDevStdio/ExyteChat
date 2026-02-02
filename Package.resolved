@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/InspireDevStdio/ExyteMediaPicker",
       "state" : {
-        "revision" : "33081d3078cd62d3c08d4ab2678514b865809727",
-        "version" : "1.0.4"
+        "revision" : "39aff7298be0602f0f56b8dab1e8508620b8fa23",
+        "version" : "1.0.5"
       }
     },
     {
