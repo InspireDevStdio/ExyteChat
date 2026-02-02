@@ -170,19 +170,24 @@ private extension InputViewModel {
     }
 
     func subscribeValidation() {
-        $attachments.sink { [weak self] _ in
-            self?.validateDraft()
-        }
-        .store(in: &subscriptions)
+        $attachments
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.validateDraft()
+            }
+            .store(in: &subscriptions)
 
-        $text.sink { [weak self] _ in
-            self?.validateDraft()
-        }
-        .store(in: &subscriptions)
+        $text
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.validateDraft()
+            }
+            .store(in: &subscriptions)
     }
 
     func subscribeGiphyPicker() {
         $showGiphyPicker
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 if !value {
                   self?.attachments.giphyMedia = nil
@@ -193,6 +198,7 @@ private extension InputViewModel {
   
     func subscribePicker() {
         $showPicker
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
                 if !value {
                     self?.attachments.medias = []
