@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/InspireDevStdio/ExyteMediaPicker",
-            exact: "1.0.3"
+            exact: "1.0.4"
         ),
         .package(
             url: "https://github.com/InspireDevStdio/ExyteActivityIndicator",
