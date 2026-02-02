@@ -16,7 +16,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/InspireDevStdio/ExyteMediaPicker",
-            exact: "1.0.2"
+            exact: "1.0.3"
         ),
         .package(
             url: "https://github.com/InspireDevStdio/ExyteActivityIndicator",
@@ -28,7 +28,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/onevcat/Kingfisher",
-            from: "8.5.0"
+            from: "8.6.2"
         ),
     ],
     targets: [
